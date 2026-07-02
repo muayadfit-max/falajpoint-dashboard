@@ -194,9 +194,10 @@ When the user says “Research [Company Name]” or “Add [Company] to the dash
 1. Run **Step 1** thoroughly (use web_search, browse_page, x_keyword_search etc. as needed).
 2. Run **Step 2** to create the six clean sections.
 3. Run **Step 3** — read the current dashboard file, add the new company object following the schema exactly, and output the **complete updated HTML**.
-4. Instruct the user to save the output over the existing file.
+4. Run **Step 4** — Automatically commit and push the updated `falajpoint-bd-dashboard.html` file to GitHub using the `run_command` tool (e.g., `git commit -am "Added [Company Name] to dashboard"; git push`).
+5. Instruct the user that the dashboard has been updated and pushed successfully to GitHub.
 
-This guarantees one beautiful, growing command center instead of dozens of fragmented HTML files.
+This guarantees one beautiful, growing command center instead of dozens of fragmented HTML files, accessible anywhere.
 
 ---
 
