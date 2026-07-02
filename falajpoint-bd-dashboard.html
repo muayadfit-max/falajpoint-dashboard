@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FalajPoint BD Intelligence Dashboard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600&display=swap');
+        
+        :root {
+            --bg: #09090b;
+            --surface: rgba(39, 39, 42, 0.6);
+            --surface-hover: rgba(63, 63, 70, 0.8);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.5);
+            --primary: #818cf8;
+            --bg-gradient: radial-gradient(circle at top right, #1e1b4b 0%, #09090b 40%);
+        }
+
+        body {
+            background: var(--bg);
+            background-image: var(--bg-gradient);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .glass {
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+        }
+
+        h1, h2, h3 { font-family: 'Outfit', sans-serif; }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .brand p { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
+
+        select {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: 1px solid var(--primary);
+            font-size: 1rem;
+            outline: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
+        }
+        select:hover { border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
+
+        .company-header {
+            margin-bottom: 2.5rem;
+            animation: fadeIn 0.5s ease;
+        }
+        .company-header h2 { font-size: 2.5rem; margin: 0 0 0.5rem 0; }
+        .tags { display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+        .tag { 
+            padding: 0.25rem 0.75rem; 
+            border-radius: 20px; 
+            font-size: 0.85rem; 
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .tag-high { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid #ef4444; }
+        .tag-industry { background: rgba(56, 189, 248, 0.2); color: #bae6fd; border: 1px solid #38bdf8; }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            transition: left 0.5s;
+            transform: skewX(-20deg);
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4), 0 0 15px var(--accent-glow);
+            border-color: rgba(255,255,255,0.2);
+            background: var(--surface-hover);
+        }
+        .card:hover::before { left: 150%; }
+
+        .card-icon { font-size: 2rem; margin-bottom: 1rem; }
+        .card-title { font-size: 1.25rem; margin: 0 0 0.5rem 0; color: var(--accent); }
+        .card-teaser { color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 100;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .modal-content {
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 2.5rem;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        .close-btn {
+            position: absolute;
+            top: 1rem; right: 1.5rem;
+            font-size: 2rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            background: none; border: none;
+            transition: color 0.2s;
+        }
+        .close-btn:hover { color: white; }
+        
+        .modal-title { font-size: 1.8rem; margin-top: 0; color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+        .modal-body { line-height: 1.6; font-size: 1.05rem; }
+        .modal-body ul { padding-left: 1.2rem; }
+        .modal-body li { margin-bottom: 0.8rem; }
+        
+        .bottleneck-item, .contact-item { background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid var(--accent); }
+        .bottleneck-item h4, .contact-item h4 { margin: 0 0 0.5rem 0; color: white; }
+        .badge { font-size: 0.75rem; padding: 0.1rem 0.4rem; background: var(--primary); color: white; border-radius: 4px; margin-left: 0.5rem; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .report-btn {
+            display: block; width: 100%; padding: 1rem; text-align: center;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            color: white; border: none; border-radius: 12px;
+            font-size: 1.1rem; font-weight: 600; cursor: pointer;
+            transition: opacity 0.3s; margin-top: 2rem;
+        }
+        .report-btn:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="brand">
+                <h1>FalajPoint BD Intelligence</h1>
+                <p>Strategic Business Development Dashboard</p>
+            </div>
+            <select id="companySelector" onchange="renderCompany(this.value)">
+                <!-- Options injected by JS -->
+            </select>
+        </header>
+
+        <main id="dashboardView">
+            <!-- Content injected by JS -->
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+        <div class="glass modal-content" onclick="event.stopPropagation()">
+            <button class="close-btn" onclick="closeModal(true)">&times;</button>
+            <h2 class="modal-title" id="modalTitle">Title</h2>
+            <div class="modal-body" id="modalBody">Content</div>
+        </div>
+    </div>
+
+    <script>
+        const companiesData = {
+            "National Mineral Water Company (SAOG)": {
+                name: "National Mineral Water Company (SAOG)",
+                industry: "Food & Beverage Services (FMCG / Bottled Water & Juices)",
+                location: "Ghala Industrial Area, Muscat, Oman",
+                headcount: "201–500 employees",
+                website: "N/A",
+                status: "Thoroughly researched",
+                priority: "HIGH",
+                confidence: "High",
+                lastUpdated: "2026-07-01",
+
+                snapshot: "NMWC is a 45-year-old publicly listed FMCG company operating in Oman. They manage multi-brand bottling lines (Tanuf, Salsabeel, Al Jabal Al Akhdar, Go Juicy) and handle exclusive third-party distribution.",
+                
+                linkedin: {
+                    status: "ACTIVE",
+                    followers: "N/A",
+                    activityLevel: "Moderate",
+                    keyFindings: "Presence of key operational and engineering leadership on LinkedIn.",
+                    hiringSignals: "N/A",
+                    leadershipSentiment: "N/A"
+                },
+                
+                deeperResearch: {
+                    website: "N/A",
+                    publicRecords: "Publicly listed company (SAOG) with 45-year history.",
+                    industryContext: "High energy demands due to Oman's extreme climate. Complex logistics spanning Oman's challenging geography.",
+                    customerEmployeeSignals: "N/A",
+                    recentNews: "N/A"
+                },
+                
+                sections: {
+                    contactDetails: {
+                        teaser: "Phone & LinkedIn profile available.",
+                        fullHtml: "<ul><li><strong>Phone:</strong> +968 24628900</li><li><strong>LinkedIn:</strong> <a style='color:var(--accent)' href='https://linkedin.com/company/national-mineral-water-company' target='_blank'>linkedin.com/company/national-mineral-water-company</a></li><li><strong>Size:</strong> 201–500 employees</li><li><strong>Industry:</strong> Food & Beverage Services (FMCG / Bottled Water & Juices)</li></ul>"
+                    },
+                    location: {
+                        teaser: "Ghala Industrial Area, Building 252",
+                        fullHtml: "<p><strong>Address:</strong> Ghala Industrial Area, Building 252, Block 252, Way 5257, Muscat, Oman</p><p><strong>Note:</strong> Ghala Industrial is a major, well-known industrial zone in Muscat — easy to access and navigate.</p>"
+                    },
+                    keyBottlenecks: {
+                        teaser: "Aging Lines, Energy Costs, SC Inefficiency",
+                        items: [
+                            { title: "Aging Production Infrastructure", type: "EVIDENCED", reasoning: "Multi-brand bottling lines running on aging equipment result in low OEE, high unplanned downtime, and slow changeovers — directly capping output capacity." },
+                            { title: "Energy & Utility Costs", type: "EVIDENCED", reasoning: "Water treatment, PET bottle blowing, and refrigeration are energy-intensive operations. In Oman's extreme climate, cooling loads amplify costs. No evidence of solar or energy recovery systems." },
+                            { title: "Supply Chain & Distribution Inefficiency", type: "EVIDENCED", reasoning: "Managing own-brand production alongside exclusive third-party distribution without integrated ERP leads to inventory mismatches and logistics costs." }
+                        ]
+                    },
+                    keyContacts: {
+                        teaser: "Ghaleb Hatab, Ali Aljunaibi, Abdulrahman Al Mansoori",
+                        people: [
+                            { rank: 1, name: "Ghaleb Hatab", title: "Operations & Projects", linkedin: "Not found", bestEntry: "Connect via LinkedIn before visit", contactInfo: "Most likely decision influencer for consulting/engineering." },
+                            { rank: 2, name: "Ali Aljunaibi", title: "Production Lines Manager", linkedin: "Not found", bestEntry: "Technical gatekeeper", contactInfo: "Endorsement is critical for production floor solutions." },
+                            { rank: 3, name: "Abdulrahman Al Mansoori", title: "Business Excellence Lead", linkedin: "Not found", bestEntry: "Internal CI champion", contactInfo: "Likely internal ally to advocate for proposal up the chain." }
+                        ]
+                    },
+                    visitProtocol: {
+                        teaser: "LinkedIn Connect -> Call -> Leave-Behind -> Visit",
+                        steps: [
+                            "<strong>Step 1 — LinkedIn Outreach First:</strong> Connect with Ghaleb Hatab and Abdulrahman Al Mansoori before any visit. Keep it relationship-focused.",
+                            "<strong>Step 2 — Call Ahead:</strong> Call +968 24628900 and ask to schedule a 20-min intro with Engineering/Operations Manager.",
+                            "<strong>Step 3 — Prepare a Tailored Leave-Behind:</strong> Bring a concise 1-page brief referencing NMWC specifically.",
+                            "<strong>Step 4 — On-Site Visit:</strong> Dress formally. Ask for your contact by name. Offer short intro only.",
+                            "<strong>Step 5 — Follow Up Within 48 Hours:</strong> Send a thank-you message with your 1-pager attached."
+                        ]
+                    },
+                    salesStrategy: {
+                        teaser: "Lead with operational pain, phased low-risk diagnostic",
+                        fullHtml: "<p><strong>Lead with operational pain, not services.</strong> Your pitch should open by referencing the specific pressures they face: multi-brand line complexity, rising energy costs in Oman's climate, and the challenge of scaling distribution across the region.</p><p><strong>Frame your value around measurable outcomes</strong> — reduced downtime, lower cost per case, energy savings as a % of OPEX, or OEE improvement benchmarks.</p><p><strong>Position the engagement as a phased, low-risk diagnostic first</strong> (e.g., a plant audit or energy assessment) rather than a large commitment upfront. Finally, emphasize local relevance — knowledge of Oman's regulatory environment, Omanization considerations, and the GCC market context.</p>"
+                    }
+                },
+                
+                fullReport: {
+                    step1: "NMWC is a 45-year-old publicly listed FMCG company operating in Oman. They manage multi-brand bottling lines and exclusive third-party distribution.",
+                    step2: "ACTIVE presence. Key leadership including Operations and Process Improvement managers are on LinkedIn.",
+                    step3: "No integrated ERP visible. High operational stress due to Oman climate and geography.",
+                    step4: [
+                        {title: "Aging Production Infrastructure", type: "EVIDENCED", detail: "Multi-brand bottling lines (Tanuf, Salsabeel, Al Jabal Al Akhdar, Go Juicy) running on aging equipment result in low OEE, high unplanned downtime, and slow changeovers."},
+                        {title: "Energy & Utility Costs", type: "EVIDENCED", detail: "Water treatment, PET bottle blowing, and refrigeration are energy-intensive. No evidence of solar or energy recovery systems."},
+                        {title: "Supply Chain & Distribution Inefficiency", type: "EVIDENCED", detail: "Managing own-brand production alongside exclusive third-party distribution without a visible integrated ERP leads to stockouts and logistics costs."}
+                    ],
+                    step5: "Feasibility Assessment, Process Improvement & Optimization, Technical Mentoring.",
+                    step6: "Ghaleb Hatab (Operations), Ali Aljunaibi (Production Lines), Abdulrahman Al Mansoori (Business Excellence). Target Ghaleb first.",
+                    step7: "We noticed NMWC managing complex multi-brand lines like Tanuf and Salsabeel alongside third-party distribution. We help similar FMCG operations reduce line changeover times and lower energy overheads in this climate.",
+                    step8: "We are an agile, 100% Omani advisory firm. Unlike global consultancies, our recommendations are vendor-neutral and tailored to Omanization considerations and GCC market realities."
+                }
+            },
+            "AL TASNIM ENTERPRISES LLC": {
+                name: "AL TASNIM ENTERPRISES LLC",
+                industry: "Conglomerate (Manufacturing, Oil & Gas EPC, Construction)",
+                location: "Ghala, Muscat, Oman",
+                headcount: "25,000+ employees",
+                website: "https://altasnimgroup.com",
+                status: "Thoroughly researched",
+                priority: "HIGH",
+                confidence: "High",
+                lastUpdated: "2026-07-02",
+
+                snapshot: "Al Tasnim is a massive Omani conglomerate operating across 17 divisions including mining, manufacturing, roads, and Oil & Gas EPC. They recently expanded into heat exchanger manufacturing via a JV.",
+                
+                linkedin: {
+                    status: "ACTIVE",
+                    followers: "N/A",
+                    activityLevel: "High",
+                    keyFindings: "GM Corporate Affairs is highly active, posting about digital transformation, PDO successes, and safety collaborations.",
+                    hiringSignals: "N/A",
+                    leadershipSentiment: "Execution-oriented and fast-moving."
+                },
+                
+                deeperResearch: {
+                    website: "https://altasnimgroup.com",
+                    publicRecords: "Active PDO Off-Plot EPC contracts in South Oman. JV with Tema Gulf for heat exchangers.",
+                    industryContext: "High chemical dependency across 17 divisions. Strict PDO compliance requirements for coatings and chemicals.",
+                    customerEmployeeSignals: "N/A",
+                    recentNews: "Showcased heat exchanger manufacturing at OPES 2026 alongside Oman Shell."
+                },
+                
+                sections: {
+                    contactDetails: {
+                        teaser: "Phone, Email & LinkedIn available.",
+                        fullHtml: "<ul><li><strong>HQ Phone:</strong> +968 2421 4000</li><li><strong>Sales Enquiry:</strong> +968 2694 6666</li><li><strong>Email:</strong> info@altasnim.com</li><li><strong>Website:</strong> <a style='color:var(--accent)' href='https://altasnimgroup.com' target='_blank'>altasnimgroup.com</a></li><li><strong>LinkedIn:</strong> <a style='color:var(--accent)' href='https://www.linkedin.com/company/al-tasnim-enterprises-llc/' target='_blank'>al-tasnim-enterprises-llc</a></li></ul>"
+                    },
+                    location: {
+                        teaser: "Ghala, Muscat (Primary HQ)",
+                        fullHtml: "<p><strong>Primary HQ:</strong> Building 484, Way No. 5007, Al Hirmal Street, Ghala, Muscat, Oman</p><p><strong>Scale:</strong> 56 operational locations across Oman, including manufacturing plants, quarries, and workshops.</p>"
+                    },
+                    keyBottlenecks: {
+                        teaser: "Chemical Selection, Coating Specs, ICV",
+                        items: [
+                            { title: "Chemical Selection Across 17 Divisions", type: "EVIDENCED", reasoning: "No in-house chemical engineering advisory visible. Relying on supplier recommendations creates cost and compliance exposure across 56 sites." },
+                            { title: "Coating & Surface Treatment in New Manufacturing", type: "EVIDENCED", reasoning: "Entered heat exchanger manufacturing. Getting coating specs wrong for sour service oilfield environments is a major PDO compliance risk." },
+                            { title: "Oilfield Chemicals & ICV Optimization", type: "HYPOTHESIS", reasoning: "Likely relying on PDO-specified chemicals without independent advisory. Engaging FalajPoint can directly lift their ICV score." }
+                        ]
+                    },
+                    keyContacts: {
+                        teaser: "Adil Al-Zadjali, FARROKH J. MASANI, Devaki Khimji",
+                        people: [
+                            { rank: 1, name: "Adil Al-Zadjali", title: "GM – Corporate Affairs", linkedin: "Yes", bestEntry: "LinkedIn InMail first", contactInfo: "Connector to all divisions. Reference OPES 2026." },
+                            { rank: 2, name: "FARROKH J. MASANI", title: "Executive Director & Group CEO", linkedin: "Yes", bestEntry: "Strategic level", contactInfo: "Focus on ICV optimization and multi-divisional advisory." },
+                            { rank: 3, name: "Devaki Khimji", title: "Managing Director", linkedin: "Yes", bestEntry: "Via Adil or Farrokh", contactInfo: "Owner-operator. Frame advisory around technology and sustainable growth." }
+                        ]
+                    },
+                    visitProtocol: {
+                        teaser: "LinkedIn -> Call -> Brief -> Open -> Low-Risk Entry",
+                        steps: [
+                            "<strong>Step 1 — Pre-Visit Outreach:</strong> Message Adil Al-Zadjali on LinkedIn. Reference OPES 2026. Ask one technical question, no pitch.",
+                            "<strong>Step 2 — Phone Follow-Up:</strong> If no response in 5 days, call +968 2421 4000 and ask for Adil by name.",
+                            "<strong>Step 3 — Prepare Your Brief:</strong> Read the Off-Plot Delivery Contract on their site. Prepare a question about chemical injection or coating specs.",
+                            "<strong>Step 4 — The Opening:</strong> Mention their OPES showcase. Ask how they handle coating specs for pressure equipment.",
+                            "<strong>Step 5 — Low-Risk Entry:</strong> Propose a no-cost chemical usage mapping session for one division to demonstrate value."
+                        ]
+                    },
+                    salesStrategy: {
+                        teaser: "Lead with OPES, leverage ICV, target the gap",
+                        fullHtml: "<p><strong>Lead with the OPES/Heat Exchanger angle:</strong> Opening with this shows you are paying attention to their recent expansion.</p><p><strong>Use the ICV lever early:</strong> Explain that engaging a 100% Omani firm directly improves their ICV score on tenders.</p><p><strong>Target the gap between ambition and technical depth:</strong> Pitch that you ensure their technical foundation is solid before they scale.</p><p><strong>Vendor-neutral differentiator:</strong> Emphasize that your margin comes from the right answer, not pushing products.</p><p><strong>Sequence:</strong> Start with one specific service (coating spec or oilfield chemical selection), then expand to a retainer across all 17 divisions.</p>"
+                    }
+                },
+                
+                fullReport: {
+                    step1: "Al Tasnim is a massive Omani conglomerate operating across 17 divisions. They recently expanded into heat exchanger manufacturing via a JV with Tema Gulf.",
+                    step2: "ACTIVE presence. GM Corporate Affairs Adil Al-Zadjali is highly engaged and visible.",
+                    step3: "Complex operations with 56 sites and active PDO EPC contracts. Fast-moving diversification but lacking visible central chemical engineering validation.",
+                    step4: [
+                        {title: "Chemical Selection Across 17 Divisions", type: "EVIDENCED", detail: "Relying on supplier recommendations for chemicals across 56 sites is a major cost and compliance exposure."},
+                        {title: "Coating & Surface Treatment in New Manufacturing", type: "EVIDENCED", detail: "Getting coating specs wrong on pressure equipment for PDO is a high-stakes compliance risk."},
+                        {title: "Oilfield Chemicals & ICV Optimization on PDO Contracts", type: "EVIDENCED + HYPOTHESIS", detail: "Missed opportunity to optimize flow assurance chemistry. FalajPoint can also directly lift their ICV score."}
+                    ],
+                    step5: "Independent Chemical Selection & Advisory, Coating & Surface-Treatment Advisory, ICV & Omanisation Advisory.",
+                    step6: "Adil Al-Zadjali (GM Corporate Affairs), Farrokh J. Masani (Group CEO), Devaki Khimji (MD). Start with Adil.",
+                    step7: "I noticed Al Tasnim showcased your heat exchanger manufacturing at OPES. When you move into pressure equipment for PDO, how do you handle the coating spec and chemical selection? Worth ten minutes to explore if independent advisory makes sense here?",
+                    step8: "We don't sell chemicals or equipment. Our only margin comes from giving you the right answer, and as a 100% Omani firm, we directly lift your ICV score."
+                }
+            },
+            "Techno Plastic Industry SAOC": {
+                name: "Techno Plastic Industry SAOC (Bin Hayl Group)",
+                industry: "Manufacturing (Plastic Piping Systems)",
+                location: "Rusayl Industrial Estate, Muscat, Oman",
+                headcount: "~201–500 employees",
+                website: "https://technopipe.com",
+                status: "Thoroughly researched",
+                priority: "HIGH",
+                confidence: "Medium",
+                lastUpdated: "2026-07-02",
+
+                snapshot: "Founded in 1998, TPI is the flagship company of the Bin Hayl Group and the first manufacturer of PPR pipes in Oman. They export to 25+ countries and hold the Sultan’s Shield for Industrial Excellence.",
+                
+                linkedin: {
+                    status: "MODERATE",
+                    followers: "N/A",
+                    activityLevel: "Moderate",
+                    keyFindings: "Presence of executive leadership including Chairman Saeed Khawar and GM Mohd Khawar.",
+                    hiringSignals: "N/A",
+                    leadershipSentiment: "Pride in national manufacturing and international expansion."
+                },
+                
+                deeperResearch: {
+                    website: "https://technopipe.com",
+                    publicRecords: "Awarded His Majesty Sultan’s Shield for Industrial Excellence in 2020.",
+                    industryContext: "Plastic pipe extrusion is highly energy and water intensive. Exporting to 25+ countries demands rigorous product formulation and compliance.",
+                    customerEmployeeSignals: "N/A",
+                    recentNews: "Focusing on acoustic and firefighting piping systems expansion."
+                },
+                
+                sections: {
+                    contactDetails: {
+                        teaser: "Website and HQ details available.",
+                        fullHtml: "<ul><li><strong>Website:</strong> <a style='color:var(--accent)' href='https://technopipe.com' target='_blank'>technopipe.com</a></li><li><strong>HQ Location:</strong> Rusayl Industrial Estate, Muscat</li><li><strong>Parent Group:</strong> Bin Hayl Group</li></ul>"
+                    },
+                    location: {
+                        teaser: "Rusayl Industrial Estate, Muscat",
+                        fullHtml: "<p><strong>Address:</strong> Rusayl Industrial Estate (and offices in Ghala), Muscat, Oman</p><p><strong>Note:</strong> Rusayl is Oman's premier industrial hub, facilitating easy site access for technical audits.</p>"
+                    },
+                    keyBottlenecks: {
+                        teaser: "Cooling OPEX, Formulation, Export Compliance",
+                        items: [
+                            { title: "Extrusion Cooling & Water Treatment", type: "HYPOTHESIS", reasoning: "Plastic pipe extrusion relies heavily on chilled water. Scaling or biological fouling in cooling systems directly impacts energy overhead and production speed." },
+                            { title: "Chemical Formulation & Additives", type: "HYPOTHESIS", reasoning: "Relying purely on raw material suppliers for masterbatches and UV stabilizers can inflate costs; independent formulation advisory ensures cost-efficiency." },
+                            { title: "Export Regulatory Compliance", type: "EVIDENCED", reasoning: "Exporting acoustic and pressure pipes to 25+ countries requires constant navigation of complex, shifting international material standards." }
+                        ]
+                    },
+                    keyContacts: {
+                        teaser: "Saeed Khawar, Mohd Khawar, Omar Al Bahri",
+                        people: [
+                            { rank: 1, name: "Mohd Khawar", title: "General Manager", linkedin: "Yes", bestEntry: "Direct Outreach", contactInfo: "Operational decision-maker for the manufacturing facility." },
+                            { rank: 2, name: "Omar Al Bahri", title: "General Manager", linkedin: "Yes", bestEntry: "LinkedIn Connect", contactInfo: "Highly visible in community and company initiatives." },
+                            { rank: 3, name: "Saeed Khawar", title: "Chairman (Bin Hayl Group)", linkedin: "Yes", bestEntry: "Via GM Endorsement", contactInfo: "Strategic authority; engage only for group-wide advisory retainers." }
+                        ]
+                    },
+                    visitProtocol: {
+                        teaser: "Acknowledge Excellence -> Plant Audit Pitch",
+                        steps: [
+                            "<strong>Step 1 — Pre-Visit Outreach:</strong> Connect with Mohd Khawar and Omar Al Bahri. Congratulate them on the Sultan’s Shield and their 25-country export reach.",
+                            "<strong>Step 2 — Call Ahead:</strong> Request a brief 15-min meeting with the Plant or Operations Manager at the Rusayl facility.",
+                            "<strong>Step 3 — Prepare Your Brief:</strong> Focus specifically on water treatment for extrusion cooling and formulation optimization.",
+                            "<strong>Step 4 — The Opening:</strong> 'You run a world-class facility here. We help similar scale plastics manufacturers shave 5-8% off their cooling and energy OPEX through optimized water chemistry.'",
+                            "<strong>Step 5 — Low-Risk Entry:</strong> Offer a complimentary audit of their cooling tower water chemistry to demonstrate immediate ROI."
+                        ]
+                    },
+                    salesStrategy: {
+                        teaser: "Target OPEX reduction in extrusion",
+                        fullHtml: "<p><strong>Acknowledge their status:</strong> Start by validating their position as Oman's pioneer in PPR and their Sultan's Shield recognition. This builds immediate rapport.</p><p><strong>Target OPEX:</strong> Plastics manufacturing margins are highly sensitive to energy and raw material costs. Pitch your Water Treatment Advisory to optimize their extrusion cooling systems, which is a guaranteed pain point in Oman's summer.</p><p><strong>Vendor-neutral formulation:</strong> Emphasize that you don't sell masterbatches or resins. Your independent advisory on their chemical mix can lower their cost-per-meter without sacrificing the quality needed for export.</p><p><strong>Expand to Group:</strong> Use success at TPI to pitch broader advisory services to the entire Bin Hayl Group.</p>"
+                    }
+                },
+                
+                fullReport: {
+                    step1: "Founded in 1998, TPI is the flagship company of the Bin Hayl Group and the first manufacturer of PPR pipes in Oman. They export to 25+ countries and hold the Sultan’s Shield for Industrial Excellence.",
+                    step2: "MODERATE presence. Leadership is visible, with strong pride in national manufacturing achievements.",
+                    step3: "Operating out of Rusayl Industrial Estate. Plastic pipe extrusion is highly energy and water intensive. Exporting demands rigorous product formulation and compliance.",
+                    step4: [
+                        {title: "Extrusion Cooling & Water Treatment", type: "HYPOTHESIS", detail: "Scaling or biological fouling in cooling systems directly impacts energy overhead and production speed."},
+                        {title: "Chemical Formulation & Additives", type: "HYPOTHESIS", detail: "Relying purely on raw material suppliers for masterbatches and UV stabilizers can inflate costs."},
+                        {title: "Export Regulatory Compliance", type: "EVIDENCED", detail: "Exporting to 25+ countries requires constant navigation of complex international material standards."}
+                    ],
+                    step5: "Water Treatment & Industrial Effluent Advisory, Formulation & Product-Development Feasibility, Chemical Compliance & Regulatory Advisory.",
+                    step6: "Mohd Khawar (GM), Omar Al Bahri (GM), Saeed Khawar (Chairman).",
+                    step7: "You run a world-class facility here at Rusayl. We help similar scale plastics manufacturers shave 5-8% off their cooling and energy OPEX through optimized water chemistry and independent formulation advisory. Worth a brief look?",
+                    step8: "We are vendor-neutral. We don't sell water treatment chemicals or plastic resins—our only goal is optimizing your process, ensuring you get the absolute best efficiency out of your current suppliers."
+                }
+            }
+        };
+
+        const sectionIcons = {
+            contactDetails: "📞",
+            location: "📍",
+            keyBottlenecks: "⚠️",
+            keyContacts: "👥",
+            visitProtocol: "🗓️",
+            salesStrategy: "🎯"
+        };
+        const sectionTitles = {
+            contactDetails: "Contact Details",
+            location: "Location",
+            keyBottlenecks: "Key Bottlenecks",
+            keyContacts: "Key Contacts",
+            visitProtocol: "Visit Protocol",
+            salesStrategy: "Sales Strategy"
+        };
+
+        let currentCompany = null;
+
+        function init() {
+            const selector = document.getElementById('companySelector');
+            for (const name in companiesData) {
+                const opt = document.createElement('option');
+                opt.value = name;
+                opt.textContent = name;
+                selector.appendChild(opt);
+            }
+            if (Object.keys(companiesData).length > 0) {
+                renderCompany(Object.keys(companiesData)[0]);
+            }
+        }
+
+        function renderCompany(name) {
+            currentCompany = companiesData[name];
+            const main = document.getElementById('dashboardView');
+            
+            let html = `
+                <div class="company-header">
+                    <h2>${currentCompany.name}</h2>
+                    <div style="color: var(--text-muted); margin-bottom: 0.5rem; max-width: 800px; line-height: 1.5;">${currentCompany.snapshot}</div>
+                    <div class="tags">
+                        <span class="tag tag-industry">${currentCompany.industry}</span>
+                        <span class="tag tag-high">Priority: ${currentCompany.priority}</span>
+                        <span class="tag glass">Confidence: ${currentCompany.confidence}</span>
+                    </div>
+                </div>
+                <div class="dashboard-grid">
+            `;
+
+            for (const [key, section] of Object.entries(currentCompany.sections)) {
+                html += `
+                    <div class="glass card" onclick="openModal('${key}')">
+                        <div class="card-icon">${sectionIcons[key]}</div>
+                        <h3 class="card-title">${sectionTitles[key]}</h3>
+                        <div class="card-teaser">${section.teaser}</div>
+                    </div>
+                `;
+            }
+
+            html += `</div>
+                <button class="report-btn" onclick="openFullReport()">View Full 8-Step Research Report</button>
+            `;
+            
+            main.innerHTML = html;
+        }
+
+        function openModal(sectionKey) {
+            const section = currentCompany.sections[sectionKey];
+            document.getElementById('modalTitle').textContent = sectionTitles[sectionKey];
+            
+            let bodyHtml = '';
+            
+            if (section.fullHtml) {
+                bodyHtml = section.fullHtml;
+            } else if (section.items) {
+                bodyHtml = section.items.map(item => `
+                    <div class="bottleneck-item">
+                        <h4>${item.title} <span class="badge">${item.type}</span></h4>
+                        <div style="font-size:0.95rem; color:var(--text-muted)">${item.reasoning}</div>
+                    </div>
+                `).join('');
+            } else if (section.people) {
+                bodyHtml = section.people.map(p => `
+                    <div class="contact-item">
+                        <h4>#${p.rank} ${p.name} - ${p.title}</h4>
+                        <div style="font-size:0.9rem; color:var(--text-muted); margin-bottom: 0.5rem">
+                            <strong>Best Entry:</strong> ${p.bestEntry}
+                        </div>
+                        <div style="font-size:0.9rem; color:var(--text-muted)">${p.contactInfo}</div>
+                    </div>
+                `).join('');
+            } else if (section.steps) {
+                bodyHtml = `<ol style="padding-left:1rem">` + section.steps.map(s => `<li style="margin-bottom:1rem">${s}</li>`).join('') + `</ol>`;
+            }
+
+            document.getElementById('modalBody').innerHTML = bodyHtml;
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function openFullReport() {
+            const rep = currentCompany.fullReport;
+            document.getElementById('modalTitle').textContent = "Full 8-Step Research Report";
+            
+            let bodyHtml = `
+                <h3 style="color:var(--accent); margin-top:0; font-size:1.2rem">1. Company Snapshot</h3>
+                <p>${rep.step1}</p>
+                <h3 style="color:var(--accent); font-size:1.2rem">2. LinkedIn Check</h3>
+                <p>${rep.step2}</p>
+                <h3 style="color:var(--accent); font-size:1.2rem">3. Deeper Research</h3>
+                <p>${rep.step3}</p>
+                <h3 style="color:var(--accent); font-size:1.2rem">4. Likely Bottlenecks</h3>
+                ${rep.step4.map(b => `<div style="margin-bottom:0.8rem"><strong>${b.title} <span class="badge">${b.type}</span></strong><br><span style="color:var(--text-muted); font-size:0.95rem">${b.detail}</span></div>`).join('')}
+                <h3 style="color:var(--accent); font-size:1.2rem">5. FalajPoint Fit</h3>
+                <p>${rep.step5}</p>
+                <h3 style="color:var(--accent); font-size:1.2rem">6. Who to Approach</h3>
+                <p>${rep.step6}</p>
+                <h3 style="color:var(--accent); font-size:1.2rem">7. Visit Opening Pitch</h3>
+                <p style="padding:1rem; border-left:3px solid var(--primary); background:rgba(255,255,255,0.05); border-radius:4px"><em>"${rep.step7}"</em></p>
+                <h3 style="color:var(--accent); font-size:1.2rem">8. Objection Handling</h3>
+                <p style="padding:1rem; border-left:3px solid var(--primary); background:rgba(255,255,255,0.05); border-radius:4px"><em>"${rep.step8}"</em></p>
+            `;
+            
+            document.getElementById('modalBody').innerHTML = bodyHtml;
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function closeModal(event) {
+            if (event === true || event.target.id === 'modalOverlay') {
+                document.getElementById('modalOverlay').classList.remove('active');
+            }
+        }
+
+        // Close on Esc key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal(true);
+            }
+        });
+
+        window.onload = init;
+    </script>
+</body>
+</html>
