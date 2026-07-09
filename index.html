@@ -956,6 +956,11 @@
                         <span class="tag tag-high">Priority: ${currentCompany.priority}</span>
                         <span class="tag glass">Confidence: ${currentCompany.confidence}</span>
                     </div>
+                    ${currentCompany.statusNote ? `
+                    <div style="margin-top: 1.25rem; padding: 1rem; background: var(--surface); border-radius: 8px; border-left: 3px solid var(--primary);">
+                        <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--primary); margin-bottom: 0.3rem; font-weight: 600;">Status</div>
+                        <div style="font-size: 0.95rem; line-height: 1.5; color: var(--text);">${currentCompany.statusNote}</div>
+                    </div>` : ''}
                 </div>
                 <div class="dashboard-grid">
             `;

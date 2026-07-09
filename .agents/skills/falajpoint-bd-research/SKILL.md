@@ -54,8 +54,8 @@ Synthesize into the exact structure used in the dashboard:
    - Chemical Compliance & Regulatory Advisory  
    - Formulation & Product-Development Feasibility  
    - Technical Mentoring & Engineering Capacity  
-6. **WHO TO APPROACH** — Target roles + specific people found on LinkedIn (name + link or “Not found”) + best entry method.  
-7. **VISIT OPENING** — 3–4 sentence natural, conversational pitch that references something real you discovered.  
+6. **WHO TO APPROACH** — Target roles + specific people found on LinkedIn (name + link or “Not found”) + best entry method. **Mandatory:** Reference the `social-selling` skill to determine the most effective LinkedIn connection formula and sequence.  
+7. **VISIT OPENING & SALES SPEECH** — 3–4 sentence natural, conversational pitch that references something real you discovered. **Crucial:** You must strictly follow the `social-selling` skill's guidelines here. Avoid "pitch-slapping." Instead, craft a perfect sales speech/conversation starter using the Problem Post, Customer Story, or Conversation Starter formulas from the `social-selling` skill.  
 8. **OBJECTION HANDLING** — 2–3 sentence answer to “Why FalajPoint instead of a big consultancy?” tailored to this company (ICV, vendor-neutral, agility, or credibility angle).
 
 Also record: Priority (HIGH/MED/LOW), Confidence (High/Medium/Low), Website, exact location, headcount estimate.
@@ -84,10 +84,10 @@ Condense the research into exactly these six sections. Keep language concise and
    Name, exact title, LinkedIn link (or “Not found”), best way to reach them, and why they matter.
 
 5. **Visit Protocol**  
-   Step-by-step practical plan: how to get the meeting, what to bring, exact opening question (from Step 1 #7), duration, follow-up.
+   Step-by-step practical plan: how to get the meeting, what to bring, exact opening question (from Step 1 #7), duration, follow-up. Leverage `social-selling` concepts to outline the transition from online engagement to offline visit.
 
-6. **Sales Strategy**  
-   Recommended positioning, the best angle for this specific company, the natural opening pitch, and the objection-handling paragraph tailored to their situation.
+6. **Sales Strategy & Perfect Speech**  
+   Recommended positioning, the best angle for this specific company, the perfect sales speech, and the objection-handling paragraph tailored to their situation. **Important:** You must embed the principles from the `social-selling` skill here, crafting a highly personalized, non-salesy opening message that focuses on operational pain or insights rather than immediate pitching.
 
 ---
 
@@ -117,6 +117,7 @@ Condense the research into exactly these six sections. Keep language concise and
     priority: "HIGH" | "MED" | "LOW",
     confidence: "High" | "Medium" | "Low",
     lastUpdated: "2026-07-01",
+    statusNote: "", // Updated manually by user via chat
 
     snapshot: "3-4 sentence overview of what they do, size, ownership, growth stage and recent direction.",
     
@@ -195,11 +196,12 @@ Condense the research into exactly these six sections. Keep language concise and
 
 When the user says “Research [Company Name]” or “Add [Company] to the dashboard”:
 
-1. Run **Step 1** thoroughly (use web_search, browse_page, x_keyword_search etc. as needed).
-2. Run **Step 2** to create the six clean sections.
-3. Run **Step 3** — read the current dashboard file, add the new company object following the schema exactly, and output the **complete updated HTML**.
-4. Run **Step 4** — Automatically commit and push the updated `c:/Users/MuayadPC/Desktop/Checking Companies Cold Visit getting deals/index.html` file to GitHub using the `run_command` tool (e.g., `git commit -am "Added [Company Name] to dashboard"; git push`).
-5. Instruct the user that the dashboard has been updated and pushed successfully to GitHub.
+1. Read the **`social-selling`** skill to internalize the perfect sales speech and outreach principles.
+2. Run **Step 1** thoroughly (use web_search, browse_page, x_keyword_search etc. as needed).
+3. Run **Step 2** to create the six clean sections, actively incorporating the `social-selling` templates.
+4. Run **Step 3** — read the current dashboard file, add the new company object following the schema exactly, and output the **complete updated HTML**.
+5. Run **Step 4** — Automatically commit and push the updated `c:/Users/MuayadPC/Desktop/Checking Companies Cold Visit getting deals/index.html` file to GitHub using the `run_command` tool (e.g., `git commit -am "Added [Company Name] to dashboard"; git push`).
+6. Instruct the user that the dashboard has been updated and pushed successfully to GitHub.
 
 This guarantees one beautiful, growing command center instead of dozens of fragmented HTML files, accessible anywhere.
 
