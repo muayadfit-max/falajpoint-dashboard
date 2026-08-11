@@ -738,7 +738,8 @@
                 status: "Thoroughly researched",
                 priority: "HIGH",
                 confidence: "High",
-                lastUpdated: "2026-07-02",
+                lastUpdated: "2026-08-11",
+                registrationStatus: "Registered",
 
                 snapshot: "Al Tasnim is a massive Omani conglomerate operating across 17 divisions including mining, manufacturing, roads, and Oil & Gas EPC. They recently expanded into heat exchanger manufacturing via a JV.",
                 
@@ -996,7 +997,9 @@
                 status: "Thoroughly researched",
                 priority: "HIGH",
                 confidence: "High",
-                lastUpdated: "2026-07-06",
+                lastUpdated: "2026-08-11",
+                registrationStatus: "Pending",
+                statusNote: "Contacted yesterday, 10 August. Registration is expected but currently pending. Reason: They are restructuring their staff and departments, and roles/responsibilities have not yet been finalized.",
 
                 snapshot: "Established in 2007 (affiliated with the CCC Group), CCED is one of Oman’s largest independent upstream operators. Producing ~30,000 BOPD from Blocks 3 and 4, they have a strong focus on Omanization and sustainable E&P, recently launching a flare gas-to-power project.",
                 
@@ -1441,12 +1444,19 @@
 
         let currentCompany = null;
 
+        function getStatusInfo(status) {
+            if (status === 'Registered') return { emoji: '🟢', color: '#10b981', label: 'Registered' };
+            if (status === 'Pending') return { emoji: '🟡', color: '#f59e0b', label: 'Pending' };
+            return { emoji: '🔴', color: '#ef4444', label: 'Not Yet Registered' };
+        }
+
         function init() {
             const selector = document.getElementById('companySelector');
             for (const name in companiesData) {
                 const opt = document.createElement('option');
                 opt.value = name;
-                opt.textContent = name;
+                const statusInfo = getStatusInfo(companiesData[name].registrationStatus);
+                opt.textContent = `${statusInfo.emoji} ${name}`;
                 selector.appendChild(opt);
             }
             if (Object.keys(companiesData).length > 0) {
@@ -1457,19 +1467,21 @@
         function renderCompany(name) {
             currentCompany = companiesData[name];
             const main = document.getElementById('dashboardView');
+            const statusInfo = getStatusInfo(currentCompany.registrationStatus);
             
             let html = `
                 <div class="company-header">
-                    <h2>${currentCompany.name}</h2>
+                    <h2>${statusInfo.emoji} ${currentCompany.name}</h2>
                     <div style="color: var(--text-muted); margin-bottom: 0.5rem; max-width: 800px; line-height: 1.5;">${currentCompany.snapshot}</div>
                     <div class="tags">
+                        <span class="tag" style="background-color: ${statusInfo.color}; color: #fff; font-weight: bold;">${statusInfo.label}</span>
                         <span class="tag tag-industry">${currentCompany.industry}</span>
                         <span class="tag tag-high">Priority: ${currentCompany.priority}</span>
                         <span class="tag glass">Confidence: ${currentCompany.confidence}</span>
                     </div>
                     ${currentCompany.statusNote ? `
-                    <div style="margin-top: 1.25rem; padding: 1rem; background: var(--surface); border-radius: 8px; border-left: 3px solid var(--primary);">
-                        <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--primary); margin-bottom: 0.3rem; font-weight: 600;">Status</div>
+                    <div style="margin-top: 1.25rem; padding: 1rem; background: var(--surface); border-radius: 8px; border-left: 4px solid ${statusInfo.color};">
+                        <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: ${statusInfo.color}; margin-bottom: 0.3rem; font-weight: 600;">Status Note</div>
                         <div style="font-size: 0.95rem; line-height: 1.5; color: var(--text);">${currentCompany.statusNote}</div>
                     </div>` : ''}
                 </div>
