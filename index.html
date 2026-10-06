@@ -311,12 +311,26 @@
                         fullHtml: "<p><strong>Address:</strong> Muscat, Al Khuwair, Taminat Complex, 6th Floor</p>"
                     },
                     keyBottlenecks: {
-                        teaser: "Wastewater Chemical Sourcing & ICV",
-                        items: [
-                            { title: "Chemical Sourcing for Wastewater Operations", type: "EVIDENCED", reasoning: "Managing 22 wastewater treatment plants requires highly reliable supplies of specialty chemicals (coagulants, flocculants). Ensuring cost-effective supply is critical." },
-                            { title: "ICV Compliance vs Technical Standards", type: "HYPOTHESIS", reasoning: "NWA must ensure strong local content (ICV) in procurement to satisfy Omani government mandates, but local suppliers must also pass SUEZ's rigorous technical standards." },
-                            { title: "Process Optimization", type: "HYPOTHESIS", reasoning: "As a wastewater treatment engineer, Rafael is likely tasked with optimizing treatment processes and reducing chemical OPEX." }
-                        ]
+                        teaser: "NaOCl heat degradation causes huge OPEX bleed (20-30 tons/day). OSG is the solution.",
+                        fullHtml: `
+                            <div style="font-size: 0.95rem; line-height: 1.6; color: var(--text);">
+                                <h3 style="margin-top:0; color: var(--accent);">Investigation Report: Sodium Hypochlorite (NaOCl)</h3>
+                                <p><strong>Core Issue:</strong> It is highly probable that NWA is suffering from a massive OPEX bleed due to "excessive" sodium hypochlorite consumption. This is not a management failure, but a chemical reality: 12.5% bulk NaOCl degrades exponentially above 30°C. In Oman's summer heat, it loses strength before it can be used, forcing plant operators to dose significantly higher volumes just to hit the required active chlorine residual.</p>
+                                
+                                <h4 style="color: var(--primary);">1. Scale & Usage at NWA</h4>
+                                <ul style="margin-top: 0.5rem; padding-left: 1.5rem; color: var(--text-muted);">
+                                    <li><strong>Locations:</strong> 22 Wastewater Treatment Plants (WWTPs), 340 wells, 4 desalination plants.</li>
+                                    <li><strong>Volume Estimate:</strong> Treating water for 2.3M people equates to approx. 575,000 m³ of water handled daily.</li>
+                                    <li><strong>Consumption:</strong> NWA is likely trucking <strong>20 to 30 metric tons of bulk bleach</strong> to remote locations every single day.</li>
+                                </ul>
+
+                                <h4 style="color: var(--primary);">2. Benchmarking (OSWS)</h4>
+                                <p style="color: var(--text-muted);">Competitors like Oman Sustainable Water Services (OSWS) and Majis have already abandoned bulk chemical deliveries. They use <strong>On-Site Sodium Hypochlorite Generation (OSG)</strong> via seawater electrochlorination (e.g., at Sohar Port). Generating a 0.8% solution on-site completely eliminates heat degradation, hazardous trucking, and stabilizes dosing OPEX.</p>
+
+                                <h4 style="color: var(--primary);">3. FalajPoint Sales Angle</h4>
+                                <p style="color: var(--text-muted);">Do not pitch to sell them chemicals. Pitch a <strong>Chemical Optimization and OSG Feasibility Audit</strong>. Offer to help Rafael quantify the exact financial losses caused by heat degradation across their 22 wastewater plants and propose localized OSG retrofits. This solves their OPEX bottleneck while satisfying ICV mandates.</p>
+                            </div>
+                        `
                     },
                     keyContacts: {
                         teaser: "Rafael Perez Martin",
