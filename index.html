@@ -8,6 +8,19 @@
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600&display=swap');
         
         :root {
+            --bg: #ffffff;
+            --surface: rgba(244, 244, 245, 0.8);
+            --surface-hover: rgba(228, 228, 231, 0.9);
+            --border: rgba(0, 0, 0, 0.1);
+            --text: #09090b;
+            --text-muted: #52525b;
+            --accent: #0284c7;
+            --accent-glow: rgba(2, 132, 199, 0.3);
+            --primary: #4f46e5;
+            --bg-gradient: radial-gradient(circle at top right, #e0e7ff 0%, #ffffff 40%);
+        }
+
+        [data-theme="dark"] {
             --bg: #09090b;
             --surface: rgba(39, 39, 42, 0.6);
             --surface-hover: rgba(63, 63, 70, 0.8);
@@ -69,14 +82,18 @@
         select {
             padding: 0.75rem 1.5rem;
             border-radius: 8px;
-            background: rgba(0,0,0,0.5);
-            color: white;
+            background: var(--surface);
+            color: var(--text);
             border: 1px solid var(--primary);
             font-size: 1rem;
             outline: none;
             cursor: pointer;
             font-family: 'Inter', sans-serif;
             transition: all 0.3s;
+        }
+        select option {
+            background: var(--bg);
+            color: var(--text);
         }
         select:hover { border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
 
@@ -206,9 +223,12 @@
                 <h1>FalajPoint BD Intelligence</h1>
                 <p>Strategic Business Development Dashboard</p>
             </div>
-            <select id="companySelector" onchange="renderCompany(this.value)">
-                <!-- Options injected by JS -->
-            </select>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <button id="themeToggle" onclick="toggleTheme()" style="background:var(--surface); color:var(--text); border:1px solid var(--border); padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 600; transition: all 0.3s;">🌙 Dark Mode</button>
+                <select id="companySelector" onchange="renderCompany(this.value)">
+                    <!-- Options injected by JS -->
+                </select>
+            </div>
         </header>
 
         <main id="dashboardView">
@@ -226,6 +246,28 @@
     </div>
 
     <script>
+        function toggleTheme() {
+            const body = document.body;
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                document.getElementById('themeToggle').textContent = '🌙 Dark Mode';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                document.getElementById('themeToggle').textContent = '☀️ Light Mode';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+        
+        // Initialize theme
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+            document.addEventListener('DOMContentLoaded', () => {
+                const btn = document.getElementById('themeToggle');
+                if (btn) btn.textContent = '☀️ Light Mode';
+            });
+        }
+
         const companiesData = {
             "National Water Alliance (NWA)": {
                 name: "National Water Alliance (NWA)",
