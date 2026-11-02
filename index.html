@@ -197,8 +197,8 @@
         .modal-body ul { padding-left: 1.2rem; }
         .modal-body li { margin-bottom: 0.8rem; }
         
-        .bottleneck-item, .contact-item { background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid var(--accent); }
-        .bottleneck-item h4, .contact-item h4 { margin: 0 0 0.5rem 0; color: white; }
+        .bottleneck-item, .contact-item { background: var(--surface); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid var(--accent); border-top: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+        .bottleneck-item h4, .contact-item h4 { margin: 0 0 0.5rem 0; color: var(--text); }
         .badge { font-size: 0.75rem; padding: 0.1rem 0.4rem; background: var(--primary); color: white; border-radius: 4px; margin-left: 0.5rem; }
 
         @keyframes fadeIn {
@@ -278,9 +278,9 @@
                 status: "Thoroughly researched",
                 priority: "HIGH",
                 confidence: "High",
-                lastUpdated: "2026-10-12",
+                lastUpdated: "2026-11-02",
                 registrationStatus: "Not Yet Registered",
-                statusNote: "Need to connect with the Sharakah team (Rawan Al Nazwani - SME Development or Tahra Al Ajmi - Marketing/Events). Offering FalajPoint's support for planning and running technical/industrial workshops, co-organizing events (like Jalsat Sharakah), and technical due diligence for funded SMEs.",
+                statusNote: "Met with the Sharakah team and delivered our partnership presentation. Offering FalajPoint's support for planning and running technical/industrial workshops, co-organizing events (like Jalsat Sharakah), and technical due diligence for funded SMEs.",
 
                 snapshot: "Established by Royal Decree in 1998, Sharakah (Fund for Development of Youth Projects) is Oman's premier SME development and funding agency. Led by CEO Ali Ahmed Muqaibal and Chairman Hani Al Zubair, Sharakah provides equity, debt financing, incubation programs (e.g. BP Khazzan), and capacity-building workshops to nurture Omani entrepreneurs and small businesses.",
                 
@@ -338,6 +338,17 @@
                     salesStrategy: {
                         teaser: "Position FalajPoint as Sharakah's Technical & Workshop Partner",
                         fullHtml: "<p><strong>The Workshop & Event Entry Point:</strong> Sharakah thrives on running impactful workshops and networking events (e.g. Jalsat Sharakah, SME Growth Programme). Position FalajPoint as a ready-to-deploy partner to plan, organize, and lead workshops on industrial entrepreneurship, chemical standards, and factory setup in Oman.</p><p><strong>The Technical Due Diligence Angle:</strong> Pitch that Sharakah de-risks its investments by having FalajPoint review the engineering and chemical feasibility of applicant SMEs before capital deployment.</p><p><strong>Oman Vision 2040 & ICV Narrative:</strong> Both entities share a 100% Omani empowerment mission. Collaborating creates an authentic, high-impact story of local engineers mentoring future Omani industrialists.</p>"
+                    },
+                    resources: {
+                        teaser: "Presentation: FalajPoint × Sharakah Meeting Deck",
+                        links: [
+                            {
+                                title: "FalajPoint × Sharakah Meeting Presentation",
+                                type: "Presentation / Web Deck",
+                                url: "https://muayadfit-max.github.io/uayadfit-max-falajpoint-sharakah/",
+                                description: "Interactive presentation deck delivered during our meeting with Sharakah showcasing how FalajPoint can collaborate on technical workshops, events, and SME technical due diligence."
+                            }
+                        ]
                     }
                 },
                 
@@ -1494,7 +1505,7 @@
                 status: "Thoroughly researched",
                 priority: "HIGH",
                 confidence: "High",
-                lastUpdated: "2026-10-12",
+                lastUpdated: "2026-11-02",
                 statusNote: "Went to Petrogas and talked to Badar for registration previously. Meeting Update (11 October 2026): Met with them to explain our company profile. Identified their 3 critical bottlenecks: (1) Water Handling — emphasized as the #1 priority due to a severe 1:9 oil-to-water ratio (~90% water cut); (2) EOR (Enhanced Oil Recovery) solutions needed; (3) Organizational structure issues. Crucial insight: they strongly advised that for future meetings, we must present concrete case studies illustrating practical applications of FalajPoint's services alongside the company profile to show exactly how operators can utilize us.",
 
                 snapshot: "Established in 1999 as the E&P arm of the MB Holding Group, Petrogas is a major independent operator. They manage mature assets like the Rima Satellites (75% interest operator), hold a 50% stake in Block 5, and operate Block 55.",
@@ -1668,7 +1679,8 @@
             keyBottlenecks: "⚠️",
             keyContacts: "👥",
             visitProtocol: "🗓️",
-            salesStrategy: "🎯"
+            salesStrategy: "🎯",
+            resources: "📂"
         };
         const sectionTitles = {
             contactDetails: "Contact Details",
@@ -1676,7 +1688,8 @@
             keyBottlenecks: "Key Bottlenecks",
             keyContacts: "Key Contacts",
             visitProtocol: "Visit Protocol",
-            salesStrategy: "Sales Strategy"
+            salesStrategy: "Sales Strategy",
+            resources: "Resources"
         };
 
         let currentCompany = null;
@@ -1728,9 +1741,19 @@
             for (const [key, section] of Object.entries(currentCompany.sections)) {
                 html += `
                     <div class="glass card" onclick="openModal('${key}')">
-                        <div class="card-icon">${sectionIcons[key]}</div>
-                        <h3 class="card-title">${sectionTitles[key]}</h3>
+                        <div class="card-icon">${sectionIcons[key] || '📄'}</div>
+                        <h3 class="card-title">${sectionTitles[key] || key}</h3>
                         <div class="card-teaser">${section.teaser}</div>
+                    </div>
+                `;
+            }
+
+            if (!currentCompany.sections.resources) {
+                html += `
+                    <div class="glass card" onclick="openModal('resources')">
+                        <div class="card-icon">${sectionIcons.resources}</div>
+                        <h3 class="card-title">${sectionTitles.resources}</h3>
+                        <div class="card-teaser">Files, Websites, Presentations & Videos</div>
                     </div>
                 `;
             }
@@ -1744,12 +1767,30 @@
 
         function openModal(sectionKey) {
             const section = currentCompany.sections[sectionKey];
-            document.getElementById('modalTitle').textContent = sectionTitles[sectionKey];
+            document.getElementById('modalTitle').textContent = sectionTitles[sectionKey] || sectionKey;
             
             let bodyHtml = '';
             
-            if (section.fullHtml) {
+            if (!section) {
+                bodyHtml = `<div style="padding: 1.5rem; text-align: center; color: var(--text-muted); background: var(--surface); border-radius: 12px; border: 1px dashed var(--border);">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📂</div>
+                    <p style="margin: 0;">No resources (files, websites, presentations, or videos) have been added for <strong>${currentCompany.name}</strong> yet.</p>
+                </div>`;
+            } else if (section.fullHtml) {
                 bodyHtml = section.fullHtml;
+            } else if (section.links) {
+                bodyHtml = section.links.map(link => `
+                    <div class="bottleneck-item" style="display: flex; flex-direction: column; gap: 0.6rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                            <h4 style="margin: 0; color: var(--text); font-size: 1.1rem;">${link.title} <span class="badge">${link.type || 'Resource'}</span></h4>
+                            <a href="${link.url}" target="_blank" rel="noopener noreferrer" style="background: linear-gradient(90deg, var(--primary), var(--accent)); color: #fff; padding: 0.45rem 1rem; border-radius: 8px; text-decoration: none; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem;">Open Resource ↗</a>
+                        </div>
+                        ${link.description ? `<div style="font-size: 0.95rem; color: var(--text-muted);">${link.description}</div>` : ''}
+                        <div style="font-size: 0.82rem; word-break: break-all;">
+                            <a href="${link.url}" target="_blank" rel="noopener noreferrer" style="color: var(--accent); text-decoration: underline;">${link.url}</a>
+                        </div>
+                    </div>
+                `).join('');
             } else if (section.items) {
                 bodyHtml = section.items.map(item => `
                     <div class="bottleneck-item">
