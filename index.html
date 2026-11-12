@@ -223,8 +223,9 @@
                 <h1>FalajPoint BD Intelligence</h1>
                 <p>Strategic Business Development Dashboard</p>
             </div>
-            <div style="display: flex; gap: 1rem; align-items: center;">
+            <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
                 <button id="themeToggle" onclick="toggleTheme()" style="background:var(--surface); color:var(--text); border:1px solid var(--border); padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 600; transition: all 0.3s;">🌙 Dark Mode</button>
+                <button id="archiveToggle" onclick="toggleArchiveView()" style="background:var(--surface); color:var(--text); border:1px solid var(--border); padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 600; transition: all 0.3s;">🗄️ Archive Section (7)</button>
                 <select id="companySelector" onchange="renderCompany(this.value)">
                     <!-- Options injected by JS -->
                 </select>
@@ -340,8 +341,14 @@
                         fullHtml: "<p><strong>The Workshop & Event Entry Point:</strong> Sharakah thrives on running impactful workshops and networking events (e.g. Jalsat Sharakah, SME Growth Programme). Position FalajPoint as a ready-to-deploy partner to plan, organize, and lead workshops on industrial entrepreneurship, chemical standards, and factory setup in Oman.</p><p><strong>The Technical Due Diligence Angle:</strong> Pitch that Sharakah de-risks its investments by having FalajPoint review the engineering and chemical feasibility of applicant SMEs before capital deployment.</p><p><strong>Oman Vision 2040 & ICV Narrative:</strong> Both entities share a 100% Omani empowerment mission. Collaborating creates an authentic, high-impact story of local engineers mentoring future Omani industrialists.</p>"
                     },
                     resources: {
-                        teaser: "Presentation: FalajPoint × Sharakah Meeting Deck",
+                        teaser: "2 Resources: Meeting Presentation + RFP Google Drive Folder",
                         links: [
+                            {
+                                title: "Sharakah RFP Folder (Google Drive)",
+                                type: "Google Drive / RFP",
+                                url: "https://drive.google.com/drive/folders/13scCRe5LtrE3_pvTRGvpB4YaufCIjeqy?usp=sharing",
+                                description: "Shared Google Drive folder containing Sharakah RFP documents and related project files."
+                            },
                             {
                                 title: "FalajPoint × Sharakah Meeting Presentation",
                                 type: "Presentation / Web Deck",
@@ -1692,6 +1699,23 @@
             resources: "Resources"
         };
 
+        const archivedCompanyNames = [
+            "National Water Alliance (NWA)",
+            "KCA Deutag",
+            "Special Oilfield Services Co. LLC",
+            "Oman Drilling and Soil Technology (ODST)",
+            "Al Baraka Oilfield Services SAOC",
+            "Techno Plastic Industry SAOC",
+            "Al Haditha Energy S.A.O.C"
+        ];
+
+        for (const name of archivedCompanyNames) {
+            if (companiesData[name]) {
+                companiesData[name].archived = true;
+            }
+        }
+
+        let isArchiveView = false;
         let currentCompany = null;
 
         function getStatusInfo(status) {
@@ -1700,18 +1724,46 @@
             return { emoji: '🔴', color: '#ef4444', label: 'Not Yet Registered' };
         }
 
-        function init() {
+        function populateSelector() {
             const selector = document.getElementById('companySelector');
-            for (const name in companiesData) {
+            selector.innerHTML = '';
+            const filteredCompanies = Object.keys(companiesData).filter(name => Boolean(companiesData[name].archived) === isArchiveView);
+            for (const name of filteredCompanies) {
                 const opt = document.createElement('option');
                 opt.value = name;
                 const statusInfo = getStatusInfo(companiesData[name].registrationStatus);
                 opt.textContent = `${statusInfo.emoji} ${name}`;
                 selector.appendChild(opt);
             }
-            if (Object.keys(companiesData).length > 0) {
-                renderCompany(Object.keys(companiesData)[0]);
+            if (filteredCompanies.length > 0) {
+                renderCompany(filteredCompanies[0]);
             }
+        }
+
+        function toggleArchiveView() {
+            isArchiveView = !isArchiveView;
+            const btn = document.getElementById('archiveToggle');
+            const archiveCount = Object.keys(companiesData).filter(name => companiesData[name].archived).length;
+            const activeCount = Object.keys(companiesData).filter(name => !companiesData[name].archived).length;
+            if (isArchiveView) {
+                btn.innerHTML = `⬅️ Active Companies (${activeCount})`;
+                btn.style.background = 'linear-gradient(90deg, var(--primary), var(--accent))';
+                btn.style.color = '#ffffff';
+                btn.style.borderColor = 'transparent';
+            } else {
+                btn.innerHTML = `🗄️ Archive Section (${archiveCount})`;
+                btn.style.background = 'var(--surface)';
+                btn.style.color = 'var(--text)';
+                btn.style.borderColor = 'var(--border)';
+            }
+            populateSelector();
+        }
+
+        function init() {
+            const archiveCount = Object.keys(companiesData).filter(name => companiesData[name].archived).length;
+            const btn = document.getElementById('archiveToggle');
+            if (btn) btn.innerHTML = `🗄️ Archive Section (${archiveCount})`;
+            populateSelector();
         }
 
         function renderCompany(name) {
@@ -1724,6 +1776,7 @@
                     <h2>${statusInfo.emoji} ${currentCompany.name}</h2>
                     <div style="color: var(--text-muted); margin-bottom: 0.5rem; max-width: 800px; line-height: 1.5;">${currentCompany.snapshot}</div>
                     <div class="tags">
+                        ${currentCompany.archived ? `<span class="tag" style="background: rgba(113, 113, 122, 0.25); color: var(--text); border: 1px solid var(--text-muted);">🗄️ Archived</span>` : ''}
                         <span class="tag" style="background-color: ${statusInfo.color}; color: #fff; font-weight: bold;">${statusInfo.label}</span>
                         <span class="tag tag-industry">${currentCompany.industry}</span>
                         <span class="tag tag-high">Priority: ${currentCompany.priority}</span>
@@ -1738,24 +1791,50 @@
                 <div class="dashboard-grid">
             `;
 
-            for (const [key, section] of Object.entries(currentCompany.sections)) {
-                html += `
-                    <div class="glass card" onclick="openModal('${key}')">
-                        <div class="card-icon">${sectionIcons[key] || '📄'}</div>
-                        <h3 class="card-title">${sectionTitles[key] || key}</h3>
-                        <div class="card-teaser">${section.teaser}</div>
-                    </div>
-                `;
+            // 1. Render Resources first as highest priority for all companies
+            const resSection = currentCompany.sections.resources;
+            html += `
+                <div class="glass card" onclick="openModal('resources')">
+                    <div class="card-icon">${sectionIcons.resources}</div>
+                    <h3 class="card-title">${sectionTitles.resources}</h3>
+                    <div class="card-teaser">${resSection ? resSection.teaser : 'Files, Websites, Presentations & Videos'}</div>
+                </div>
+            `;
+
+            // 2. Render remaining sections in priority order
+            const sectionPriorityOrder = [
+                'contactDetails',
+                'keyBottlenecks',
+                'location',
+                'keyContacts',
+                'visitProtocol',
+                'salesStrategy'
+            ];
+
+            for (const key of sectionPriorityOrder) {
+                const section = currentCompany.sections[key];
+                if (section) {
+                    html += `
+                        <div class="glass card" onclick="openModal('${key}')">
+                            <div class="card-icon">${sectionIcons[key] || '📄'}</div>
+                            <h3 class="card-title">${sectionTitles[key] || key}</h3>
+                            <div class="card-teaser">${section.teaser}</div>
+                        </div>
+                    `;
+                }
             }
 
-            if (!currentCompany.sections.resources) {
-                html += `
-                    <div class="glass card" onclick="openModal('resources')">
-                        <div class="card-icon">${sectionIcons.resources}</div>
-                        <h3 class="card-title">${sectionTitles.resources}</h3>
-                        <div class="card-teaser">Files, Websites, Presentations & Videos</div>
-                    </div>
-                `;
+            // Render any additional custom sections
+            for (const [key, section] of Object.entries(currentCompany.sections)) {
+                if (key !== 'resources' && !sectionPriorityOrder.includes(key)) {
+                    html += `
+                        <div class="glass card" onclick="openModal('${key}')">
+                            <div class="card-icon">${sectionIcons[key] || '📄'}</div>
+                            <h3 class="card-title">${sectionTitles[key] || key}</h3>
+                            <div class="card-teaser">${section.teaser}</div>
+                        </div>
+                    `;
+                }
             }
 
             html += `</div>
