@@ -280,7 +280,7 @@
                 priority: "HIGH",
                 confidence: "High",
                 lastUpdated: "2026-11-02",
-                registrationStatus: "Not Yet Registered",
+                registrationStatus: "Proposal Processed",
                 statusNote: "Met with the Sharakah team and delivered our partnership presentation. Offering FalajPoint's support for planning and running technical/industrial workshops, co-organizing events (like Jalsat Sharakah), and technical due diligence for funded SMEs.",
 
                 snapshot: "Established by Royal Decree in 1998, Sharakah (Fund for Development of Youth Projects) is Oman's premier SME development and funding agency. Led by CEO Ali Ahmed Muqaibal and Chairman Hani Al Zubair, Sharakah provides equity, debt financing, incubation programs (e.g. BP Khazzan), and capacity-building workshops to nurture Omani entrepreneurs and small businesses.",
@@ -1721,6 +1721,7 @@
         function getStatusInfo(status) {
             if (status === 'Registered') return { emoji: '🟢', color: '#10b981', label: 'Registered' };
             if (status === 'Pending') return { emoji: '🟡', color: '#f59e0b', label: 'Pending' };
+            if (status === 'Proposal Processed') return { emoji: '🔵', color: '#1a9df1', label: 'Proposal Processed' };
             return { emoji: '🔴', color: '#ef4444', label: 'Not Yet Registered' };
         }
 

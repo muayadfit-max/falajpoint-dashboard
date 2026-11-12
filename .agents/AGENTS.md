@@ -18,6 +18,12 @@ When the user provides a status update in the chat for a specific company (e.g.,
 4. Use your code editing tools to update the file.
 5. Commit and push the changes to GitHub with a message like "Updated status for [Company Name]".
 
+## Company Status Colors (`registrationStatus`)
+- `"Registered"` → 🟢 green
+- `"Proposal Processed"` → 🔵 blue (a proposal has been submitted / is being processed)
+- `"Pending"` → 🟡 yellow
+- `"Not Yet Registered"` (or empty) → 🔴 red
+
 ## Archiving or Restoring a Company
 To archive a company, add its exact `companiesData` key to the `archivedCompanyNames` list in `index.html`; to restore it, remove it from that list. Do not delete company data unless the user explicitly asks to remove the company. Commit with a message like "Archived [Company Name]".
 
