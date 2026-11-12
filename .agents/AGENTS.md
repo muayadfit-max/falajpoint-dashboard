@@ -32,3 +32,6 @@ Add an entry to the company's `sections.resources.links` array (`title`, `type`,
 
 ## Going Live
 The live website updates from the `main` branch. If the change was pushed to a different branch, tell the user it still needs to be merged into `main` before it shows on the website.
+
+## Privacy: Keep the Dashboard Out of Search Engines
+The dashboard contains private business intelligence and must never be indexed. Always keep the `<meta name="robots" content="noindex, ...">` tags in `index.html` and the `X-Robots-Tag` header in `vercel.json`. Do NOT add a `robots.txt` that disallows crawling: it would stop Google from seeing the noindex instruction.
