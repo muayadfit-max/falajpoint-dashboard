@@ -9,7 +9,7 @@ Turn any target company name into high-quality, actionable business development 
 
 **Core Principle (Non-Negotiable)**  
 You **MUST** always work with the single master file:  
-**`c:/Users/MuayadPC/Desktop/Checking Companies Cold Visit getting deals/index.html`**  
+**`index.html` at the root of the `falajpoint-dashboard` repository** (locally: `c:/Users/MuayadPC/Desktop/Checking Companies Cold Visit getting deals/index.html`)  
 
 Never create a new HTML file for each company. Always append or update the company inside the existing dashboard. This keeps all research in one place with consistent UX, diagram engine, and interactivity.
 
@@ -93,14 +93,14 @@ Condense the research into exactly these six sections. Keep language concise and
 
 ### STEP 3: Update the Single Master Dashboard (Most Important)
 
-**You must output the COMPLETE updated HTML file content.**
+**Edit `index.html` in place.** Never create a second HTML file and do not paste the whole file into chat.
 
 **Process:**
-1. Open/read the current `c:/Users/MuayadPC/Desktop/Checking Companies Cold Visit getting deals/index.html`
+1. Read the current `index.html`.
 2. Locate the `companiesData` JavaScript object (near the top of the `<script>` section).
-3. Add a new key (or update existing) using the **exact schema** below.
-4. Output the **full HTML** with your new/updated company included.
-5. Tell the user: “Replace the existing `c:/Users/MuayadPC/Desktop/Checking Companies Cold Visit getting deals/index.html` with this new version. All previous companies remain accessible in the dropdown.”
+3. Add the new company as the **first** key in `companiesData` (newest company first, so it opens by default), or update the existing key, using the **exact schema** below.
+4. Open the page in a browser (or headless Chromium) and confirm there are no JavaScript errors, the company shows in the dropdown, and every card opens.
+5. Commit and push (see Step 4).
 
 **Never** create a second HTML file. Never change the visual layout, CSS, JS interactivity, or modal logic — only add data inside `companiesData`.
 
@@ -117,7 +117,10 @@ Condense the research into exactly these six sections. Keep language concise and
     priority: "HIGH" | "MED" | "LOW",
     confidence: "High" | "Medium" | "Low",
     lastUpdated: "2026-07-01",
+    registrationStatus: "Not Yet Registered", // vendor registration status, if known
     statusNote: "", // Updated manually by user via chat
+    // archived: true is NOT set here; archive a company by adding its name to the
+    // archivedCompanyNames list further down in index.html
 
     snapshot: "3-4 sentence overview of what they do, size, ownership, growth stage and recent direction.",
     
@@ -168,6 +171,12 @@ Condense the research into exactly these six sections. Keep language concise and
         salesStrategy: {
             teaser: "Positioning summary",
             fullHtml: "Opening pitch + objection handling + best angle in rich HTML"
+        },
+        resources: {   // shown FIRST on the dashboard; links: [] if none yet
+            teaser: "e.g. 2 Resources: Meeting Presentation + RFP Folder",
+            links: [
+                { title: "...", type: "Website / Presentation / Google Drive / Video", url: "https://...", description: "..." }
+            ]
         }
     },
     
@@ -197,10 +206,10 @@ Condense the research into exactly these six sections. Keep language concise and
 When the user says “Research [Company Name]” or “Add [Company] to the dashboard”:
 
 1. Read the **`social-selling`** skill to internalize the perfect sales speech and outreach principles.
-2. Run **Step 1** thoroughly (use web_search, browse_page, x_keyword_search etc. as needed).
+2. Run **Step 1** thoroughly (use whatever web search and page-reading tools are available).
 3. Run **Step 2** to create the six clean sections, actively incorporating the `social-selling` templates.
-4. Run **Step 3** — read the current dashboard file, add the new company object following the schema exactly, and output the **complete updated HTML**.
-5. Run **Step 4** — Automatically commit and push the updated `c:/Users/MuayadPC/Desktop/Checking Companies Cold Visit getting deals/index.html` file to GitHub using the `run_command` tool (e.g., `git commit -am "Added [Company Name] to dashboard"; git push`).
+4. Run **Step 3** — read the current dashboard file, add the new company object following the schema exactly, editing `index.html` in place, and verify it renders.
+5. Run **Step 4** — Commit and push `index.html` to GitHub (e.g., `git commit -am "Added [Company Name] to dashboard"` then `git push`). The live site updates from `main`; if working on another branch, tell the user it must be merged to `main` to go live.
 6. Instruct the user that the dashboard has been updated and pushed successfully to GitHub.
 
 This guarantees one beautiful, growing command center instead of dozens of fragmented HTML files, accessible anywhere.
@@ -209,9 +218,9 @@ This guarantees one beautiful, growing command center instead of dozens of fragm
 
 ## File Location
 
-Master Dashboard: `c:/Users/MuayadPC/Desktop/Checking Companies Cold Visit getting deals/index.html`
+Master Dashboard: `index.html` at the repository root (locally: `c:/Users/MuayadPC/Desktop/Checking Companies Cold Visit getting deals/index.html`)
 
-The dashboard already contains one high-quality example company (“Sohar AgriChem LLC”) so you can see exactly how the data renders. Use it as your template for new entries.
+The dashboard already contains complete example companies (e.g. “Sharakah (Youth Projects Development Fund)” and “Petrogas E&P”) so you can see exactly how the data renders. Use it as your template for new entries.
 
 **Remember**: Quality > quantity. One deep, well-structured company entry is far more valuable than several shallow ones.
 
